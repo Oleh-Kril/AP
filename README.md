@@ -3,15 +3,15 @@
 
 <hr>
 
-    Task: Create backend for cinema
+    Task: How to set up:
 
-<strong> Details: </strong>
 <ul>
-    <li>Clients can see all films that are currently in cinema films list</li>
-    <li>Client can filter films of specific day</li>
-    <li>Clients can buy tickets</li>
-    <li>Moderators can add and remove film to cinema films list</li>
-    <li>Moderators can place films from list to creates or edit showing movies schedule</li>
+    <li>pip install pipenv</li>
+    <li>pipenv install</li>
+    <br>
+    <li>pipenv shell</li>
+    <br>
+    <li>sudo gunicorn -w 4 "main:create_app()"</li>
 </ul>
 
     
