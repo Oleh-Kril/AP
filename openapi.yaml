@@ -1,0 +1,599 @@
+openapi: 3.0.3
+info:
+  title: Cinema REST API
+  description: |-
+    This is a REST API for cinema service site.
+    
+    - Repository: https://github.com/Oleh-Kril/AP
+  version: 1.0.0
+servers:
+    - url: 127.0.0.1:5000
+paths:
+  /movie:
+    post:
+      tags:
+        - movie
+      summary: Add movie to the catalogue
+      description: Add movie to the catalogue
+      operationId: addMovie
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Movie'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Movie'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Movie'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Movie'
+        '400':
+          description: Invalid data
+        '404':
+          description: Movie not found
+        '405':
+          description: Validation exception
+      security:
+        - cinema_auth:
+            - write:movies
+            - read:movies
+    put:
+      tags:
+        - movie
+      summary: Update information about movie
+      description: Enter movie information to update
+      operationId: updateMovie
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Movie'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Movie'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Movie'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Movie'
+        '400':
+          description: Invalid data
+        '404':
+          description: Movie not found
+        '405':
+          description: Validation exception
+      security:
+        - cinema_auth:
+            - write:movies
+            - read:movies  
+  /movies:
+    get:
+      summary: Show all movies
+      tags:
+        - movies
+      operationId: showAllMovies
+      responses:
+        '200':
+          description: successfull operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Movies"
+        '404':
+          description: Movies not found
+      security:
+        - cinema_auth:
+            - write:movies
+            - read:movies 
+
+  /movies/findByCountry:
+    get:
+      tags:
+        - movies
+      summary: Find movies by country
+      description: ''
+      operationId: findMoviesByCountry
+      parameters:
+        - name: country
+          in: query
+          description: Country where movie's directed to return
+          required: false
+          explode: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movies'          
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movies'
+        '400':
+          description: Invalid country
+        '404':
+          description: Movie not found
+      security:
+        - cinema_auth:
+            - write:movies
+            - read:movies
+  /movies/findByGenre:
+    get:
+      tags:
+        - movies
+      summary: Find movie by genre
+      description: ''
+      operationId: findMovieByGenre
+      parameters:
+        - name: genre
+          in: query
+          description: ''
+          required: false
+          explode: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movies'          
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movies'
+        '400':
+          description: Invalid genre value
+        '404':
+          description: Genre not found
+      security:
+        - cinema_auth:
+            - write:movies
+            - read:movies
+  /movies/{director}:
+    get:
+      tags:
+        - movies
+      summary: Find movie by director
+      description: Returns movies by that director
+      operationId: getMoviesByDirector
+      parameters:
+        - name: director
+          in: path
+          description: Director's films to return
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'          
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'
+        '400':
+          description: Invalid DirectorFullName
+        '404':
+          description: Movies not found
+      security:
+        - cinema_auth:
+            - write:movies
+            - read:movies
+  /movies/findByTitle:
+    get:
+      tags:
+        - movies
+      summary: Find movie by title
+      description: Returns 
+      operationId: getBookByName
+      parameters:
+        - name: title
+          in: query
+          description: title of movie to return
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Movie'
+        '400':
+          description: Invalid title supplied
+        '404':
+          description: Movie not found
+      security:
+        - cinema_auth:
+            - write:movies
+            - read:movies
+  /movie/{id}:
+    get:
+      tags:
+        - movie
+      summary: Find movie by ID
+      description: Returns a movie with specified ID
+      operationId: getMovieById
+      parameters:
+        - name: id
+          in: path
+          description: ID of movie to return
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Movie'
+        '400':
+          description: Invalid ID
+        '404':
+          description: Movie not found
+      security:
+        - cinema_auth:
+            - write:movies
+            - read:movies
+    delete:
+      tags:
+        - movie
+      summary: Deletes a movie
+      description: ''
+      operationId: deleteMovie
+      parameters:
+        - name: id
+          in: path
+          description: ID of movie to delete
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid ID value
+      security:
+        - cinema_auth:
+            - write:movies
+            - read:movies
+  /admin:
+    get:
+      tags:
+        - admin
+      summary: "Logs admin"
+      operationId: adminLogIn
+      parameters:
+        - name: "username"
+          in: "query"
+          description: "The username to login"
+          required: true
+          schema:
+            type: "string"
+        - name: password
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Invalid username or password
+        '404':
+          description: Admin account not found
+
+  /user:
+    post:
+      tags:
+        - user
+      summary: Create user
+      description: ''
+      operationId: createUser
+      requestBody:
+        description: Creates user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+  /user/login:
+    get:
+      tags:
+        - user
+      summary: Logs user into the account
+      description: ''
+      operationId: userLogIn
+      parameters:
+        - name: username
+          in: query
+          description: The username for login
+          required: false
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for login
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Invalid username or password
+        '404':
+          description: User not found
+  /user/logout:
+    get:
+      tags:
+        - user
+      summary: Logs out currently logged user
+      description: ''
+      operationId: logoutUser
+      parameters: []
+      responses:
+        default:
+          description: successful operation
+  /user/{username}:
+    put:
+      tags:
+        - user
+      summary: Change username
+      description: This can only be done by the logged in user
+      operationId: userChangeUsername
+      parameters:
+        - name: username
+          in: path
+          description: name that need to be deleted
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Updating username
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        default:
+          description: successful operation
+    delete:
+      tags:
+        - user
+      summary: Delete user
+      description: This can only be done by the logged in user.
+      operationId: deleteUser
+      parameters:
+        - name: username
+          in: path
+          description: The name that needs to be deleted
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+
+
+components:
+  schemas:
+    Ticket:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        seat_type:
+          type: string
+          enum: 
+            - 'forward'
+            - 'middle'
+            - 'back'
+        time:
+          type: string
+          format: date-time
+    Genre:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: action
+      xml:
+        name: genre
+    Director:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        full_name:
+          type: string
+          example: Eugene Makarenko
+      xml:
+        name: director
+    Movie:
+      required:
+        - name
+        - posterUrl
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 10
+        title:
+          type: string
+          example: ""
+        price:
+          type: integer
+          example: 150 
+        genre:
+          $ref: '#/components/schemas/Genre'
+        posterUrl:
+          type: string
+          xml:
+            wrapped: true
+          items:
+            type: string
+            xml:
+              name: posterUrl
+        trailerUrl:
+          type: string
+          xml:
+            wrapped: true
+          items:
+            type: string
+            xml:
+              name: trailerUrl
+        direcor:
+          type: array
+          items:
+            $ref: '#/components/schemas/Director'
+        description:
+          type: string
+          example: This movie is about
+        country:
+          type: string
+          example: USA
+    Movies:
+      type: array
+      items:
+        $ref: "#/components/schemas/Movie"
+    Admin:
+      type: object
+      required:
+        - name
+        - surname
+        - username
+        - password
+      properties:
+        name:
+          type: string
+          example: Glek
+        surname:
+          type: string
+          example: Glekiv
+        username:
+          type: string
+          example: bebebeu
+        password:
+          type: string
+          example: '12345678'
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        username:
+          type: string
+          example: theUser
+        name:
+          type: string
+          example: Glek
+        surname:
+          type: string
+          example: Glekiv
+        email:
+          type: string
+          example: glekglekiv@gmail.com
+        password:
+          type: string
+          example: '1234578787'
+        phone:
+          type: string
+          example: '+380980000000'
+      xml:
+        name: user
+  securitySchemes:
+    cinema_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://cinema.swagger.io/oauth/authorize
+          scopes:
+            write:movies: change movies
+            read:movies: read movies
