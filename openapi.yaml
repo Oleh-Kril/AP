@@ -462,6 +462,7 @@ components:
         - rowN
         - seatN
         - user_id
+        - scheduled_movie_id
       properties:
         id:
           type: integer
@@ -473,6 +474,9 @@ components:
           type: integer
           example: 12
         user_id:
+          type: integer
+          example: 1
+        scheduled_movie_id:
           type: integer
           example: 1
     Genre:
