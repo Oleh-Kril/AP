@@ -45,6 +45,12 @@ paths:
           description: Movie not found
         '405':
           description: Validation exception
+        "default":
+          description: Send general error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
       security:
         - cinema_auth:
             - write:movies
@@ -74,7 +80,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Movie'          
+                $ref: '#/components/schemas/Movie'
             application/xml:
               schema:
                 $ref: '#/components/schemas/Movie'
@@ -84,16 +90,50 @@ paths:
           description: Movie not found
         '405':
           description: Validation exception
+        "default":
+          description: Send general error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
       security:
         - cinema_auth:
             - write:movies
-            - read:movies  
+            - read:movies
   /movies:
     get:
       summary: Show all movies
       tags:
         - movies
       operationId: showAllMovies
+      parameters:
+        - name: title
+          in: query
+          description: title of movie to return
+          required: false
+          schema:
+            type: string
+
+        - name: genre
+          in: query
+          description: find all with genre
+          required: false
+          schema:
+            $ref: "#/components/schemas/Genre"
+
+        - name: country
+          in: query
+          description: find all created in country X
+          required: false
+          schema:
+            $ref: "#/components/schemas/Country"
+
+        - name: director
+          in: query
+          description: find all created by director X
+          required: false
+          schema:
+            $ref: "#/components/schemas/Director"
       responses:
         '200':
           description: successfull operation
@@ -103,153 +143,19 @@ paths:
                 $ref: "#/components/schemas/Movies"
         '404':
           description: Movies not found
+        '400':
+          description: Invalid parameter
+        "default":
+          description: Send general error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
       security:
         - cinema_auth:
             - write:movies
-            - read:movies 
+            - read:movies
 
-  /movies/findByCountry:
-    get:
-      tags:
-        - movies
-      summary: Find movies by country
-      description: ''
-      operationId: findMoviesByCountry
-      parameters:
-        - name: country
-          in: query
-          description: Country where movie's directed to return
-          required: false
-          explode: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Movies'          
-            application/xml:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Movies'
-        '400':
-          description: Invalid country
-        '404':
-          description: Movie not found
-      security:
-        - cinema_auth:
-            - write:movies
-            - read:movies
-  /movies/findByGenre:
-    get:
-      tags:
-        - movies
-      summary: Find movie by genre
-      description: ''
-      operationId: findMovieByGenre
-      parameters:
-        - name: genre
-          in: query
-          description: ''
-          required: false
-          explode: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Movies'          
-            application/xml:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Movies'
-        '400':
-          description: Invalid genre value
-        '404':
-          description: Genre not found
-      security:
-        - cinema_auth:
-            - write:movies
-            - read:movies
-  /movies/{director}:
-    get:
-      tags:
-        - movies
-      summary: Find movie by director
-      description: Returns movies by that director
-      operationId: getMoviesByDirector
-      parameters:
-        - name: director
-          in: path
-          description: Director's films to return
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Movie'          
-            application/xml:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Movie'
-        '400':
-          description: Invalid DirectorFullName
-        '404':
-          description: Movies not found
-      security:
-        - cinema_auth:
-            - write:movies
-            - read:movies
-  /movies/findByTitle:
-    get:
-      tags:
-        - movies
-      summary: Find movie by title
-      description: Returns 
-      operationId: getBookByName
-      parameters:
-        - name: title
-          in: query
-          description: title of movie to return
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Movie'          
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Movie'
-        '400':
-          description: Invalid title supplied
-        '404':
-          description: Movie not found
-      security:
-        - cinema_auth:
-            - write:movies
-            - read:movies
   /movie/{id}:
     get:
       tags:
@@ -270,7 +176,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Movie'          
+                $ref: '#/components/schemas/Movie'
             application/xml:
               schema:
                 $ref: '#/components/schemas/Movie'
@@ -278,6 +184,12 @@ paths:
           description: Invalid ID
         '404':
           description: Movie not found
+        "default":
+          description: Send general error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
       security:
         - cinema_auth:
             - write:movies
@@ -300,10 +212,65 @@ paths:
           description: Successful operation
         '400':
           description: Invalid ID value
+        "default":
+          description: Send general error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
       security:
         - cinema_auth:
             - write:movies
             - read:movies
+
+  /scheduledMovies:
+    get:
+      summary: Show all movies in schedule
+      tags:
+        - scheduledMovies
+      operationId: showAllScheduledMovies
+      parameters:
+        - name: when
+          in: query
+          description: show list of movies untill date
+          required: true
+          schema:
+            type: string
+            enum:
+              - today
+              - tomorrow
+              - week
+              - month
+
+        - name: type
+          in: query
+          description: find all with type (3d, 2d..)
+          required: false
+          schema:
+            type: string
+            enum:
+              - 2D
+              - 3D
+              - 4D
+
+      responses:
+        '200':
+          description: successfull operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Movies"
+        '404':
+          description: Error
+        '400':
+          description: Invalid parameter
+        "default":
+          description: Send general error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /admin:
     get:
       tags:
@@ -329,6 +296,12 @@ paths:
           description: Invalid username or password
         '404':
           description: Admin account not found
+        "default":
+          description: Send general error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   /user:
     post:
@@ -393,6 +366,12 @@ paths:
           description: Invalid username or password
         '404':
           description: User not found
+        "default":
+          description: Send general error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /user/logout:
     get:
       tags:
@@ -453,25 +432,49 @@ paths:
           description: Invalid username supplied
         '404':
           description: User not found
+        "default":
+          description: Send general error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
 
 components:
   schemas:
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          example: 500
+        message:
+          type: string
+          example: Unhandled error
+
     Ticket:
       type: object
+      required:
+        - id
+        - rowN
+        - seatN
+        - user_id
       properties:
         id:
           type: integer
           example: 1
-        seat_type:
-          type: string
-          enum: 
-            - 'forward'
-            - 'middle'
-            - 'back'
-        time:
-          type: string
-          format: date-time
+        rowN:
+          type: integer
+          example: 5
+        seatN:
+          type: integer
+          example: 12
+        user_id:
+          type: integer
+          example: 1
     Genre:
       type: object
       properties:
@@ -496,8 +499,10 @@ components:
         name: director
     Movie:
       required:
-        - name
+        - title
         - posterUrl
+        - description
+        - country
       type: object
       properties:
         id:
@@ -505,12 +510,21 @@ components:
           example: 10
         title:
           type: string
-          example: ""
-        price:
+          example: "Lost Island"
+        createdYear:
           type: integer
-          example: 150 
+          example: 2022
+        long:
+          type: integer
+          example: 89
+        ageRestriction:
+          type: integer
+          example: 18
         genre:
-          $ref: '#/components/schemas/Genre'
+          type: array
+          items:
+            $ref: '#/components/schemas/Genre'
+
         posterUrl:
           type: string
           xml:
@@ -535,19 +549,79 @@ components:
           type: string
           example: This movie is about
         country:
-          type: string
-          example: USA
+          $ref: '#/components/schemas/Country'
+
     Movies:
       type: array
       items:
         $ref: "#/components/schemas/Movie"
+    Country:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Ukraine
+    Language:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Ukrainian
+
+    ScheduledMovies:
+      type: object
+      required:
+        - id
+        - datetime
+        - movie_id
+        - price
+        - hall
+        - type
+        - language_id
+      properties:
+        id:
+          type: integer
+          example: 1
+        datetime:
+          type: string
+          example: 21\03\2004 22:05
+        movide_id:
+          type: integer
+          example: 2
+        price:
+          type: integer
+          example: 120
+        hall:
+          type: string
+          example: 2B
+        type:
+          type: string
+          enum:
+            - 2D
+            - 3D
+            - 4D
+        language_id:
+          type: integer
+          example: 1
     Admin:
       type: object
       required:
         - name
         - surname
         - username
-        - password
+        - token
       properties:
         name:
           type: string
@@ -558,7 +632,7 @@ components:
         username:
           type: string
           example: bebebeu
-        password:
+        token:
           type: string
           example: '12345678'
     User:
@@ -580,9 +654,9 @@ components:
         email:
           type: string
           example: glekglekiv@gmail.com
-        password:
+        token:
           type: string
-          example: '1234578787'
+          example: '4a8a9fc31dc15a4b87bb145b05db3ae0bf2333e4'
         phone:
           type: string
           example: '+380980000000'
