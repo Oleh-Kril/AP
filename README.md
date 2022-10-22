@@ -1,17 +1,18 @@
 # Kril Oleh | Application programming
-<h2> Lab4: </h2>
+<h2> Swagger </h2>
 
 <hr>
 
-    Task: How to set up:
+    Task: Create backend for cinema
 
+<strong> Details: </strong>
 <ul>
-    <li>pip install pipenv</li>
-    <li>pipenv install</li>
-    <br>
-    <li>pipenv shell</li>
-    <br>
-    <li>sudo gunicorn -w 4 "main:create_app()"</li>
+    <li>Clients can see all films that are currently in cinema films list</li>
+    <li>Client can filter films of specific day</li>
+    <li>Clients can buy tickets</li>
+    <li>Clients can choose a sit</li>
+    <li>Moderators can add and remove film to cinema films list</li>
+    <li>Moderators can place films from list to creates or edit showing movies schedule</li>
 </ul>
 
     
