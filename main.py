@@ -1,13 +1,25 @@
-import json
 
-from flask_bcrypt import Bcrypt
 from flask import Flask, jsonify, request, Response
 from db import *
-
+from flask_swagger_ui import get_swaggerui_blueprint
 
 def create_app(testing: bool = True):
     app = Flask(__name__)
-    bcrypt = Bcrypt(app)
+
+    ### swagger specific ###
+    SWAGGER_URL = '/swagger'
+    API_URL = '/static/swagger.yaml'
+    SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(
+        SWAGGER_URL,
+        API_URL,
+        config={
+            'app_name': "Seans-Python-Flask-REST-Boilerplate"
+        }
+    )
+    app.register_blueprint(SWAGGERUI_BLUEPRINT, url_prefix=SWAGGER_URL)
+
+    ### end swagger specific ###
+
     # JUST FUNCTIONS
     def dump_or_404(data, Schema):
         if data == 404:

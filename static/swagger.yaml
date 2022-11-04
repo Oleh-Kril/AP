@@ -9,103 +9,12 @@ info:
 servers:
     - url: 127.0.0.1:5000
 paths:
-  /movie:
-    post:
-      tags:
-        - movie
-      summary: Add movie to the catalogue
-      description: Add movie to the catalogue
-      operationId: addMovie
-      requestBody:
-        description: ''
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Movie'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/Movie'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Movie'
-        required: true
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Movie'          
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Movie'
-        '400':
-          description: Invalid data
-        '404':
-          description: Movie not found
-        '405':
-          description: Validation exception
-        "default":
-          description: Send general error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-      security:
-        - cinema_auth:
-            - write:movies
-            - read:movies
-    put:
-      tags:
-        - movie
-      summary: Update information about movie
-      description: Enter movie information to update
-      operationId: updateMovie
-      requestBody:
-        description: ''
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Movie'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/Movie'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Movie'
-        required: true
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Movie'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Movie'
-        '400':
-          description: Invalid data
-        '404':
-          description: Movie not found
-        '405':
-          description: Validation exception
-        "default":
-          description: Send general error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-      security:
-        - cinema_auth:
-            - write:movies
-            - read:movies
   /movies:
     get:
-      summary: Show all movies
       tags:
-        - movies
-      operationId: showAllMovies
+       - movies
+      summary: Get movies with query parameters
+      operationId: getMovies
       parameters:
         - name: title
           in: query
@@ -155,11 +64,56 @@ paths:
         - cinema_auth:
             - write:movies
             - read:movies
+    post:
+      tags:
+        - movies
+      summary: Add movie to the catalogue
+      description: Add movie to the catalogue
+      operationId: addMovie
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Movie'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Movie'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Movie'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Movie'
+        '400':
+          description: Invalid data
+        '404':
+          description: Movie not found
+        '405':
+          description: Validation exception
+        "default":
+          description: Send general error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - cinema_auth:
+            - write:movies
+            - read:movies
 
-  /movie/{id}:
+  /movies/{id}:
     get:
       tags:
-        - movie
+        - movies
       summary: Find movie by ID
       description: Returns a movie with specified ID
       operationId: getMovieById
@@ -196,7 +150,7 @@ paths:
             - read:movies
     delete:
       tags:
-        - movie
+        - movies
       summary: Deletes a movie
       description: ''
       operationId: deleteMovie
@@ -222,6 +176,55 @@ paths:
         - cinema_auth:
             - write:movies
             - read:movies
+    put:
+      tags:
+        - movies
+      summary: Update information about movie
+      description: Enter movie information to update
+      operationId: updateMovie
+      parameters:
+        - name: id
+          in: path
+          description: ID of movie to update
+          required: true
+          schema:
+            type: integer
+
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Movie'
+        required: true
+
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Movie'
+        '400':
+          description: Invalid data
+        '404':
+          description: Movie not found
+        '405':
+          description: Validation exception
+        "default":
+          description: Send general error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - cinema_auth:
+            - write:movies
+            - read:movies
+
 
   /scheduledMovies:
     get:
@@ -230,17 +233,14 @@ paths:
         - scheduledMovies
       operationId: showAllScheduledMovies
       parameters:
-        - name: when
+        - name: until
           in: query
           description: show list of movies untill date
           required: true
           schema:
             type: string
-            enum:
-              - today
-              - tomorrow
-              - week
-              - month
+            example: 2022-08-09
+
 
         - name: type
           in: query
