@@ -1,11 +1,11 @@
 # Kril Oleh | Application programming
-<h2> Swagger </h2>
+<h2> Implementation of API </h2>
 
 <hr>
 
-    Task: Create backend for cinema
+    Task: Create api without 
 
-<strong> Details: </strong>
+<strong> Examples: </strong>
 <ul>
     <li>Clients can see all films that are currently in cinema films list</li>
     <li>Client can filter films of specific day</li>

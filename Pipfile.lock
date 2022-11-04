@@ -1,10 +1,13 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "81cb5d5f0b11719d8d9c5ec9cc683fdcf959c652fda256d5552a82d0f459a99c"
+            "sha256": "19db6785faacf99b3c3d4f25ef1e67d8ababfd7081a1077036a930c3c47f719c"
         },
         "pipfile-spec": 6,
         "requires": {
+            "Flask": "2.0.3",
+            "SQLAlchemy": "1.4.42",
+            "alembic": "1.7.7",
             "python_version": "3.6"
         },
         "sources": [
