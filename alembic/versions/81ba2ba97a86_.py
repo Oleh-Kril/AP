@@ -86,7 +86,7 @@ def upgrade() -> None:
     sa.UniqueConstraint('movie_id')
     )
     op.create_table('scheduled_movie',
-    sa.Column('scheduled_movie_id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('scheduledmovie_id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('date_time', sa.DATETIME(), nullable=False),
     sa.Column('price', sa.Integer(), nullable=False),
     sa.Column('hall', sa.String(length=3), nullable=False),
@@ -95,17 +95,17 @@ def upgrade() -> None:
     sa.Column('id_movie', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['id_language'], ['language.language_id'], ),
     sa.ForeignKeyConstraint(['id_movie'], ['movie.movie_id'], ),
-    sa.PrimaryKeyConstraint('scheduled_movie_id'),
-    sa.UniqueConstraint('scheduled_movie_id')
+    sa.PrimaryKeyConstraint('scheduledmovie_id'),
+    sa.UniqueConstraint('scheduledmovie_id')
     )
     op.create_table('ticket',
     sa.Column('ticket_id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('row_n', sa.Integer(), nullable=False),
     sa.Column('seat_n', sa.Integer(), nullable=False),
     sa.Column('id_language', sa.Integer(), nullable=False),
-    sa.Column('id_scheduled_movie', sa.Integer(), nullable=False),
+    sa.Column('id_scheduledmovie', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['id_language'], ['user.user_id'], ),
-    sa.ForeignKeyConstraint(['id_scheduled_movie'], ['scheduled_movie.scheduled_movie_id'], ),
+    sa.ForeignKeyConstraint(['id_scheduledmovie'], ['scheduled_movie.scheduledmovie_id'], ),
     sa.PrimaryKeyConstraint('ticket_id'),
     sa.UniqueConstraint('ticket_id')
     )
