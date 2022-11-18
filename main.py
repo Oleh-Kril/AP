@@ -1,5 +1,5 @@
 
-from flask import Flask, jsonify, request, Response
+from flask import Flask, jsonify, request, Response, make_response
 from db import *
 from flask_swagger_ui import get_swaggerui_blueprint
 
@@ -167,11 +167,16 @@ if __name__ == "__main__":
 # bcrypt.check_password_hash(pw_hash, 'hunter2')
 
 # curl -X "POST" -H "Content-Type: application/json" -d '{
-#     "id_user": 1,
-#     "row_n": 2,
-#     "seat_n": 1,
-#     "id_scheduledmovie": 5
-# }' 'http://127.0.0.1:5000/api/v1/tickets'
+#     "title": "The Life",
+#     "poster_url": "http://google.com",
+#     "created_year": "2004-08-31",
+#     "long": 178,
+#     "age_restriction" : 18,
+#     "country" : "Ukraine",
+#     "genre" : "Horror",
+#     "director" : "Unnamed",
+#     "description" : "This is the time of war with terrible beast from east"
+# }' 'http://127.0.0.1:5000/api/v1/movies'
 
 # curl 'http://127.0.0.1:5000/api/v1/scheduledMovies/5/tickets'
 
@@ -192,3 +197,9 @@ if __name__ == "__main__":
 #     "email": "someemail@gmail.com",
 #     "phone": "0988138276"
 # }
+
+    # movie = Movie(title="Test Film", poster_url="http://google.com", created_year= date(2022, 8, 20), long=30,
+    #               age_restriction=18, country="Ukraine", genre="Horror", director="Unnamed",
+    #               description="This is the time of war with terrible beast from east")
+
+# {'created_year': '2022-08-20', 'genre': 'Horror', 'title': 'Test Film', 'director': 'Unnamed', 'trailer_url': None, 'country': 'Ukraine', 'movie_id': None, 'long': 30, 'age_restriction': 18, 'description': 'This is the time of war with terrible beast from east', 'poster_url': 'http://google.com'}
