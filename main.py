@@ -7,6 +7,7 @@ from flask import Flask, jsonify, request, Response, make_response, session
 from db import *
 from flask_swagger_ui import get_swaggerui_blueprint
 
+
 def create_app(testing: bool = True):
     app = Flask(__name__)
 
@@ -20,17 +21,12 @@ def create_app(testing: bool = True):
             if not token:
                 return jsonify({'Alert!': 'Token is missing!'}), 401
 
-
-            # print(datetime.strptime(data.get("expiration")) < datetime.utcnow(), data.get("expiration"))
             try:
                 data = jwt.decode(token, app.config['SECRET_KEY'])
                 isAdmin = data.get("admin")
 
-                if not(isAdmin):
+                if not (isAdmin):
                     return jsonify({'Message': 'Admin access only!'}), 403
-                # if datetime(data.get("expiration")) < datetime.utcnow():
-                #     return jsonify({'Message': 'Your token expiration time passed. '
-                #                                'Please log in again'}), 403
 
             # You can use the JWT errors in exception
             except jwt.InvalidTokenError:
@@ -83,6 +79,7 @@ def create_app(testing: bool = True):
             if isinstance(data, list):
                 return jsonify(Schema.dump(data, many=True))
             return jsonify(Schema.dump(data))
+
     # MOVIES ROUTE
     @app.route("/api/v1/movies", methods=['GET'])
     def get_movies():
@@ -99,6 +96,7 @@ def create_app(testing: bool = True):
     def get_movie(id):
         response = Movie.get_by_id(id)
         return dump_or_404(response, MovieSchema())
+
     @app.route("/api/v1/movies-preview", methods=['GET'])
     def get_movies_preview():
         args = request.args
@@ -109,11 +107,13 @@ def create_app(testing: bool = True):
             response = Movie.get_preview()
 
         return jsonify(MoviePreviewSchema().dump(response, many=True))
+
     @app.route("/api/v1/movies/<id>", methods=['DELETE'])
     @admin_token_required
     def delete_movie(id):
         response = Movie.delete_by_id(id)
-        return Response(f"Status: {response}" , status=response)
+        return Response(f"Status: {response}", status=response)
+
     @app.route("/api/v1/movies", methods=['POST'])
     @admin_token_required
     def post_movie():
@@ -142,6 +142,7 @@ def create_app(testing: bool = True):
             response = ScheduledMovie.get_all()
 
         return jsonify(ScheduledMovieSchema().dump(response, many=True))
+
     @app.route("/api/v1/scheduledMovies", methods=['POST'])
     # @admin_token_required
     def post_scheduledMovie():
@@ -173,6 +174,7 @@ def create_app(testing: bool = True):
             return Response("Invalid id", status=404)
         else:
             return jsonify(TicketSchema().dump(ScheduledMovie.get_tickets(id), many=True))
+
     # TICKET ROUTE
     @app.route("/api/v1/tickets", methods=['GET'])
     @admin_token_required
@@ -180,6 +182,7 @@ def create_app(testing: bool = True):
         response = Ticket.get_all()
 
         return jsonify(TicketSchema().dump(response, many=True))
+
     @app.route("/api/v1/tickets/<id>", methods=['GET'])
     @admin_token_required
     def get_ticket_by_id(id):
@@ -228,7 +231,8 @@ def create_app(testing: bool = True):
         response = User.get_with_filter(args)
 
         return jsonify(UserSchema().dump(response, many=True))
-    @app.route("/api/v1/sign-in", methods=['POST'])
+
+    @app.route("/api/v1/sign-up", methods=['POST'])
     def create_user():
         user_json = UserSchema().load(request.get_json())
         user_object = User(**user_json)
@@ -239,14 +243,17 @@ def create_app(testing: bool = True):
     @app.route("/api/v1/log-in", methods=['POST'])
     def login_user():
         user_json = UserSchema().load(request.get_json(), partial=True)
-        if User.auth(user_json['user_name'], user_json['password_hash']):
+        user = User.auth(user_json['user_name'], user_json['password_hash'])
+        if user:
             session['logged_in'] = True
 
             token = jwt.encode({
                 'user': user_json['user_name'],
-                'expiration': str(datetime.utcnow() + timedelta(minutes=60*24*3))
+                'expiration': str(datetime.utcnow() + timedelta(minutes=60 * 24 * 3))
             }, app.config['SECRET_KEY'])
-            return jsonify({'token': token.decode('utf-8')})
+
+            user.token = token.decode('utf-8')
+            return jsonify(UserSchema().dump(user))
         else:
             return make_response('Unable to verify', 403, {'WWW-Authenticate': 'Basic realm: "Authentication Failed "'})
 
@@ -260,14 +267,17 @@ def create_app(testing: bool = True):
     @app.route('/api/v1/admin', methods=['POST'])
     def login_admin():
         admin_json = request.get_json()
-        if Admin.auth(admin_json['user_name'], admin_json['password_hash']):
+        admin = Admin.auth(admin_json['user_name'], admin_json['password_hash'])
+        if admin:
             session['logged_in'] = True
 
             token = jwt.encode({
                 'admin': admin_json['user_name'],
                 'expiration': str(datetime.utcnow() + timedelta(minutes=60 * 24 * 1))
             }, app.config['SECRET_KEY'])
-            return jsonify({'token': token.decode('utf-8')})
+
+            admin.token = token.decode('utf-8')
+            return jsonify(AdminSchema().dump(admin))
         else:
             return make_response('Unable to verify', 403, {'WWW-Authenticate': 'Basic realm: "Authentication Failed"'})
 
@@ -306,4 +316,3 @@ def create_app(testing: bool = True):
 
 if __name__ == "__main__":
     create_app().run(debug=True)
-

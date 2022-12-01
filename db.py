@@ -9,11 +9,13 @@ SessionFactory = sessionmaker(bind=engine)
 Session = scoped_session(SessionFactory)
 Base = declarative_base()
 
+
 class CustomBase():
     @classmethod
     def get_all(cls):
         with Session() as session:
             return session.query(cls).all()
+
     @classmethod
     def post_one(cls, item):
         with Session() as session:
@@ -21,6 +23,7 @@ class CustomBase():
             session.commit()
 
             return 200
+
     @classmethod
     def get_by_id(cls, id):
         with Session() as session:
@@ -29,7 +32,6 @@ class CustomBase():
             if class_object is None:
                 return 404
             return class_object
-
 
     @classmethod
     def delete_by_id(cls, id):
@@ -62,16 +64,18 @@ class CustomBase():
             session.commit()
             return 200
 
+
 class AuthBase():
     @classmethod
     def auth(cls, user_name, password_hash):
         with Session() as session:
-            admin = session.query(cls).filter(and_(cls.user_name == user_name,
-                                                    cls.password_hash == password_hash)).first()
-            if admin:
-                return True
+            account = session.query(cls).filter(and_(cls.user_name == user_name,
+                                                     cls.password_hash == password_hash)).first()
+            if account:
+                return account
             else:
-                return False
+                return None
+
 
 class User(AuthBase, CustomBase, Base):
     __tablename__ = 'user'
@@ -94,6 +98,7 @@ class User(AuthBase, CustomBase, Base):
         self.email = email
         self.phone = phone
 
+
 class UserSchema(Schema):
     user_id = fields.Integer()
     user_name = fields.String(required=True)
@@ -102,6 +107,8 @@ class UserSchema(Schema):
     phone = fields.String(required=True)
 
     password_hash = fields.String(load_only=True)
+    token = fields.String(dump_only=True)
+
 
 class Admin(AuthBase, CustomBase, Base):
     __tablename__ = "admin"
@@ -117,12 +124,16 @@ class Admin(AuthBase, CustomBase, Base):
         self.full_name = full_name
         self.password_hash = password_hash
 
+
 class AdminSchema(Schema):
     admin_id = fields.Integer()
 
-    user_name = fields.String()
-    full_name = fields.String()
-    password_hash = fields.String()
+    user_name = fields.String(required=True)
+    full_name = fields.String(required=True)
+    password_hash = fields.String(required=True)
+
+    token = fields.String(dump_only=True)
+
 
 class Movie(CustomBase, Base):
     __tablename__ = "movie"
@@ -137,10 +148,10 @@ class Movie(CustomBase, Base):
     trailer_url = Column('trailer_url', String(150), default=None)
     country = Column('country', String(50), nullable=False)
     genre = Column('genre', String(100), nullable=False)
-    director =Column('director', String(60), nullable=False)
+    director = Column('director', String(60), nullable=False)
 
     def __init__(self, title, poster_url, created_year, long, age_restriction,
-                 country, genre, director, description = "", trailer_url = ""):
+                 country, genre, director, description="", trailer_url=""):
         self.title = title
         self.poster_url = poster_url
         self.created_year = created_year
@@ -167,6 +178,7 @@ class Movie(CustomBase, Base):
 
             return movies_list
 
+
 class MovieSchema(Schema):
     movie_id = fields.Integer()
 
@@ -182,15 +194,18 @@ class MovieSchema(Schema):
     description = fields.String()
     trailer_url = fields.Url()
 
+
 class MoviePreviewSchema(Schema):
     movie_id = fields.Integer()
 
     title = fields.String(required=True)
     poster_url = fields.Url(required=True)
+
+
 class Hall(CustomBase, Base):
     __tablename__ = "hall"
 
-    hall_name = Column("hall_name",String(3), primary_key=True, autoincrement=False)
+    hall_name = Column("hall_name", String(3), primary_key=True, autoincrement=False)
     row_amount = Column("row_amount", Integer, nullable=False)
     seat_amount = Column("seat_amount", Integer, nullable=False)
 
@@ -233,6 +248,8 @@ class HallSchema(Schema):
     hall_name = fields.String()
     row_amount = fields.Integer()
     seat_amount = fields.Integer()
+
+
 class ScheduledMovie(CustomBase, Base):
     __tablename__ = "scheduled_movie"
 
@@ -268,6 +285,7 @@ class ScheduledMovie(CustomBase, Base):
                 return 200
             else:
                 return 404
+
     @classmethod
     def get_with_filter(cls, parameters):
         with Session() as session:
@@ -279,11 +297,13 @@ class ScheduledMovie(CustomBase, Base):
                     q = q.filter(getattr(cls, attr).ilike(f"%%{value}%%"))
 
             return q.all()
+
     @classmethod
     def get_tickets(cls, id):
         with Session() as session:
-            return session.query(Ticket).filter_by(id_scheduledmovie = id)\
+            return session.query(Ticket).filter_by(id_scheduledmovie=id) \
                 .with_entities(Ticket.row_n, Ticket.seat_n).all()
+
 
 class ScheduledMovieSchema(Schema):
     scheduledmovie_id = fields.Integer()
@@ -299,6 +319,7 @@ class ScheduledMovieSchema(Schema):
     movie = fields.Nested(MoviePreviewSchema, dump_only=True)
     id_movie = fields.Integer(load_only=True)
 
+
 class Ticket(CustomBase, Base):
     __tablename__ = "ticket"
 
@@ -307,15 +328,13 @@ class Ticket(CustomBase, Base):
     seat_n = Column('seat_n', Integer, nullable=False)
     id_user = Column('id_user', Integer, ForeignKey(User.user_id), nullable=False)
     id_scheduledmovie = Column('id_scheduledmovie', Integer, ForeignKey(ScheduledMovie.scheduledmovie_id),
-                                nullable=False)
+                               nullable=False)
     details = Column('details', String(120))
 
     user = relationship(User, backref='user', lazy='joined')
     scheduled_movie = relationship(ScheduledMovie, backref='scheduled_movie', lazy='joined')
 
-
-
-    def __init__(self, row_n, seat_n, id_user, id_scheduledmovie, details = None):
+    def __init__(self, row_n, seat_n, id_user, id_scheduledmovie, details=None):
         self.row_n = row_n
         self.seat_n = seat_n
         self.id_user = id_user
@@ -326,10 +345,10 @@ class Ticket(CustomBase, Base):
     @classmethod
     def get_tickets_of_user(cls, id):
         with Session() as session:
-            return session.query(Ticket).filter_by(id_user = id).all()
+            return session.query(Ticket).filter_by(id_user=id).all()
+
 
 class TicketSchema(Schema):
-
     ticket_id = fields.Integer()
 
     row_n = fields.Integer(required=True)
@@ -341,6 +360,7 @@ class TicketSchema(Schema):
 
     id_scheduledmovie = fields.Integer()
     scheduled_movie = fields.Nested(ScheduledMovieSchema)
+
 
 if __name__ == "__main__":
     pass

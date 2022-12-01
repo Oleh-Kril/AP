@@ -28,21 +28,21 @@ paths:
           description: find all with genre
           required: false
           schema:
-            $ref: "#/components/schemas/Genre"
+             type: string
 
         - name: country
           in: query
           description: find all created in country X
           required: false
           schema:
-            $ref: "#/components/schemas/Country"
+             type: string
 
         - name: director
           in: query
           description: find all created by director X
           required: false
           schema:
-            $ref: "#/components/schemas/Director"
+             type: string
       responses:
         '200':
           description: successfull operation
@@ -225,8 +225,98 @@ paths:
             - write:movies
             - read:movies
 
-
   /scheduledMovies:
+    get:
+      tags:
+       - scheduledMovies
+      summary: Get movies with query parameters
+      operationId: getScheduledMovies
+      parameters:
+        - name: until
+          in: query
+          description: show list of movies untill date
+          required: true
+          schema:
+            type: string
+            example: 2022-08-09
+
+        - name: type
+          in: query
+          description: find all with type (3d, 2d..)
+          required: false
+          schema:
+            type: string
+            enum:
+              - 2D
+              - 3D
+              - 4D
+      responses:
+        '200':
+          description: successfull operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduledMovies"
+        '404':
+          description: Movies not found
+        '400':
+          description: Invalid parameter
+        "default":
+          description: Send general error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - cinema_auth:
+            - write:movies
+            - read:movies
+    post:
+      tags:
+        - scheduledMovies
+      summary: Add movie to the catalogue
+      description: Add movie to the catalogue
+      operationId: addScheduledMovies
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduledMovies'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/ScheduledMovies'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ScheduledMovies'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduledMovies'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ScheduledMovies'
+        '400':
+          description: Invalid data
+        '404':
+          description: Movie not found
+        '405':
+          description: Validation exception
+        "default":
+          description: Send general error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - cinema_auth:
+            - write:movies
+            - read:movies
+  /scheduledMovies/{id}:
     get:
       summary: Show all movies in schedule
       tags:
@@ -240,6 +330,12 @@ paths:
           schema:
             type: string
             example: 2022-08-09
+        - name: id
+          in: path
+          description: ID of ScheduledMovie to delete
+          required: true
+          schema:
+            type: integer
 
 
         - name: type
@@ -259,7 +355,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Movies"
+                $ref: "#/components/schemas/ScheduledMovies"
         '404':
           description: Error
         '400':
@@ -270,22 +366,97 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+    put:
+      tags:
+        - scheduledMovies
+      summary: Update information about movie
+      description: Enter movie information to update
+      operationId: updateScheduledMovie
+      parameters:
+        - name: id
+          in: path
+          description: ID of movie to update
+          required: true
+          schema:
+            type: integer
 
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduledMovies'
+        required: true
+        
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduledMovies'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ScheduledMovies'
+        '400':
+          description: Invalid data
+        '404':
+          description: Movie not found
+        '405':
+          description: Validation exception
+        "default":
+          description: Send general error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - cinema_auth:
+            - write:movies
+            - read:movies
+    delete:
+      tags:
+        - scheduledMovies
+      summary: Deletes a scheduledMovies
+      description: ''
+      operationId: deleteScheduledMovie
+      parameters:
+        - name: id
+          in: path
+          description: ID of ScheduledMovie to delete
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid ID value
+        "default":
+          description: Send general error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - cinema_auth:
+            - write:movies
+            - read:movies
   /admin:
-    get:
+    post:
       tags:
         - admin
       summary: "Logs admin"
       operationId: adminLogIn
       parameters:
         - name: "username"
-          in: "query"
+          in: header
           description: "The username to login"
           required: true
           schema:
             type: "string"
         - name: password
-          in: query
+          in: header
           required: true
           schema:
             type: string
@@ -303,7 +474,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /user:
+  /sign-up:
     post:
       tags:
         - user
@@ -332,73 +503,15 @@ paths:
             application/xml:
               schema:
                 $ref: '#/components/schemas/User'
-  /user/login:
-    get:
+  /log-in:
+    post:
       tags:
         - user
-      summary: Logs user into the account
+      summary: Log in a user
       description: ''
-      operationId: userLogIn
-      parameters:
-        - name: username
-          in: query
-          description: The username for login
-          required: false
-          schema:
-            type: string
-        - name: password
-          in: query
-          description: The password for login
-          required: false
-          schema:
-            type: string
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/xml:
-              schema:
-                type: string
-            application/json:
-              schema:
-                type: string
-        '400':
-          description: Invalid username or password
-        '404':
-          description: User not found
-        "default":
-          description: Send general error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-  /user/logout:
-    get:
-      tags:
-        - user
-      summary: Logs out currently logged user
-      description: ''
-      operationId: logoutUser
-      parameters: []
-      responses:
-        default:
-          description: successful operation
-  /user/{username}:
-    put:
-      tags:
-        - user
-      summary: Change username
-      description: This can only be done by the logged in user
-      operationId: userChangeUsername
-      parameters:
-        - name: username
-          in: path
-          description: name that need to be deleted
-          required: true
-          schema:
-            type: string
+      operationId: logInUser
       requestBody:
-        description: Updating username
+        description: Creates user
         content:
           application/json:
             schema:
@@ -412,6 +525,30 @@ paths:
       responses:
         default:
           description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+  /users:
+    get:
+      tags:
+        - user
+      summary: Returns all users accounts
+      description: ''
+      operationId: getAllUsers
+      parameters: []
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Users'
+
+  /user/{username}:
     delete:
       tags:
         - user
@@ -479,28 +616,23 @@ components:
         scheduled_movie_id:
           type: integer
           example: 1
-    Genre:
+    Hall:
+      required:
+        - hall_name
+        - row_amount
+        - seat_amount
       type: object
       properties:
-        id:
-          type: integer
-          example: 1
-        name:
+        hall_name:
           type: string
-          example: action
-      xml:
-        name: genre
-    Director:
-      type: object
-      properties:
-        id:
+          example: 3B
+        row_amount:
           type: integer
-          example: 1
-        full_name:
-          type: string
-          example: Eugene Makarenko
-      xml:
-        name: director
+          example: 11
+        seat_amount:
+          type: integer 
+          example: 8
+          
     Movie:
       required:
         - title
@@ -527,7 +659,8 @@ components:
         genre:
           type: array
           items:
-            $ref: '#/components/schemas/Genre'
+            type: string
+            example: "fantasy"
 
         posterUrl:
           type: string
@@ -548,42 +681,18 @@ components:
         direcor:
           type: array
           items:
-            $ref: '#/components/schemas/Director'
+            type: string
+            example: "Dude dudich"
         description:
           type: string
           example: This movie is about
         country:
-          $ref: '#/components/schemas/Country'
-
+          type: string
+          example: "Ukraine"
     Movies:
       type: array
       items:
         $ref: "#/components/schemas/Movie"
-    Country:
-      type: object
-      required:
-        - id
-        - name
-      properties:
-        id:
-          type: integer
-          example: 1
-        name:
-          type: string
-          example: Ukraine
-    Language:
-      type: object
-      required:
-        - id
-        - name
-      properties:
-        id:
-          type: integer
-          example: 1
-        name:
-          type: string
-          example: Ukrainian
-
     ScheduledMovies:
       type: object
       required:
@@ -593,7 +702,7 @@ components:
         - price
         - hall
         - type
-        - language_id
+        - language
       properties:
         id:
           type: integer
@@ -607,7 +716,7 @@ components:
         price:
           type: integer
           example: 120
-        hall:
+        hall_name:
           type: string
           example: 2B
         type:
@@ -616,7 +725,7 @@ components:
             - 2D
             - 3D
             - 4D
-        language_id:
+        language:
           type: integer
           example: 1
     Admin:
@@ -666,6 +775,10 @@ components:
           example: '+380980000000'
       xml:
         name: user
+    Users:
+      type: array
+      items:
+         $ref: "#/components/schemas/User"
   securitySchemes:
     cinema_auth:
       type: oauth2

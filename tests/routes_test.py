@@ -49,7 +49,7 @@ def test_log_in_admin(client):
 
     assert response.status_code == 403
 
-def test_sign_in_user(client):
+def test_sign_up_user(client):
     user = {
         "user_name": "user",
         "full_name": "User Userovich",
@@ -58,7 +58,7 @@ def test_sign_in_user(client):
         "phone": "0988138276"
     }
 
-    response = client.post("/api/v1/sign-in",
+    response = client.post("/api/v1/sign-up",
                            json=user,
                            headers={"Content-Type": "application/json"})
 

@@ -2,9 +2,9 @@ from datetime import datetime, date
 from db import *
 session = Session()
 
-# admin1 = Admin('admin', 'Oleh Kril','password')
-# session.add(admin1)
-#
+admin1 = Admin('admin', 'Oleh Kril','password')
+session.add(admin1)
+
 
 # hall2 = Hall("44S", 18, 12)
 # session.add(hall2)
@@ -29,9 +29,9 @@ session = Session()
 
 
 # ticket1 = Ticket(1, 1, 1, id_scheduledmovie=5)
-ticket2 = Ticket(row_n=1, seat_n=2, id_user=18, id_scheduledmovie=19)
+# ticket2 = Ticket(row_n=1, seat_n=2, id_user=18, id_scheduledmovie=19)
 # session.add(ticket1)
-session.add(ticket2)
+# session.add(ticket2)
 
 
 # #
@@ -77,6 +77,7 @@ session.close()
 # curl -X "DELETE" "http://127.0.0.1:5000/api/v1/movies/2"
 
 # curl -X "PUT" -H "Content-Type: application/json" \
+# -H "token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhZG1pbiI6ImFkbWluIiwiZXhwaXJhdGlvbiI6IjIwMjItMTEtMjIgMTk6MDc6MTUuMDEzMDQxIn0.k040sjsMZp2ior3CYkhHV7gz6WsM8wUx3EmtCjxFTs4" \
 # -d '{
 #     "seat_n": 5
 # }' 'http://127.0.0.1:5000/api/v1/tickets/1'
